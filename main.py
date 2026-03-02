@@ -6,6 +6,7 @@ if getattr(sys, 'frozen', False):
     os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '0'
 
 from core import YandexMusicExporter
+from core import YoutubeImoirter
 from core.track import Track
 
 
