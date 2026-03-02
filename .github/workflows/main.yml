@@ -2,8 +2,6 @@ name: Build Executables (Win & Linux)
 
 on:
   push:
-    branches:
-      - improvements
     tags:
       - 'v*'
   workflow_dispatch:
