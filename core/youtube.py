@@ -173,18 +173,54 @@ class YoutubeImporter:
         return not_found, errors
 
     def _get_best_result(self, results: List[dict], track: Track) -> dict:
-        songs = []
-        for result in results:
-            if 'videoId' not in result.keys():
-                continue
-            if result.get('category') == 'Top result':
+        # Приводим оригинальное название к нижнему регистру и убираем пробелы по краям
+        ya_title = track.name.lower().strip()
+        
+        # Разбиваем строку исполнителей ("Артист 1, Артист 2") в список
+        ya_artists = [a.strip().lower() for a in track.artist.split(',')]
+
+        # Оставляем только те результаты, у которых есть videoId (исключаем пустые карточки)
+        valid_songs = [r for r in results if r.get('videoId')]
+        
+        if not valid_songs:
+            # Если почему-то нет треков с videoId, возвращаем первый попавшийся элемент (или пустой словарь)
+            return results[0] if results else {}
+
+        best_partial_match = None
+
+        for result in valid_songs:
+            yt_title = result.get('title', '').lower().strip()
+            
+            # Получаем список исполнителей из ответа YouTube Music
+            yt_artists_list = result.get('artists', [])
+            yt_artists = [a.get('name', '').lower().strip() for a in yt_artists_list]
+
+            # Проверяем, совпадает ли хотя бы один исполнитель
+            artist_match = False
+            for ya_artist in ya_artists:
+                for yt_artist in yt_artists:
+                    # Проверяем вхождение
+                    if ya_artist in yt_artist or yt_artist in ya_artist:
+                        artist_match = True
+                        break
+                if artist_match:
+                    break
+            
+            # УСЛОВИЕ 1: Идеальное совпадение
+            if ya_title == yt_title and artist_match:
                 return result
-            if result.get('title') == track.name:
-                return result
-            songs.append(result)
-        if len(songs) == 0:
-            return results[0]
-        return songs[0]
+            
+            # УСЛОВИЕ 2: Частичное совпадение названия
+            if best_partial_match is None and artist_match and (ya_title in yt_title or yt_title in ya_title):
+                best_partial_match = result
+
+        # Если нашли частичное совпадение
+        if best_partial_match:
+            return best_partial_match
+
+        # Точных совпадений по тексту нет
+        # В таком случае просто доверяемся поисковику YouTube и берем самый первый трек из выдачи.
+        return valid_songs[0]
 
 
 # Алиас для обратной совместимости
