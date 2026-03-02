@@ -18,10 +18,10 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact_name: yandex2ytmusic-linux
-            build_cmd: pyinstaller --noconfirm --onefile --collect-all playwright --name yandex2ytmusic main.py
+            build_cmd: pyinstaller --noconfirm --onefile --collect-all playwright --collect-all ytmusicapi --name yandex2ytmusic main.py
           - os: windows-latest
             artifact_name: yandex2ytmusic-windows.exe
-            build_cmd: pyinstaller --noconfirm --onefile --collect-all playwright --name yandex2ytmusic.exe main.py
+            build_cmd: pyinstaller --noconfirm --onefile --collect-all playwright --collect-all ytmusicapi --name yandex2ytmusic.exe main.py
 
     steps:
       - name: Checkout Repository
