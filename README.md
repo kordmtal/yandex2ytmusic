@@ -19,8 +19,8 @@
 2. Распакуйте архив.
 3. Откройте терминал в директории с файлом и выдайте права на исполнение, после чего запустите утилиту:
    ```bash
-   chmod +x yandex2ytmusic-linux
-   ./yandex2ytmusic-linux
+   chmod +x yandex2ytmusic
+   ./yandex2ytmusic
    ```
 
 ---
