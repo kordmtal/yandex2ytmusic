@@ -6,21 +6,19 @@ A utility for automated transfer of saved track libraries from Yandex Music to Y
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 [![License](https://img.shields.io/badge/license-MIT-weight)](LICENSE)
 
-## Getting Started
+## Execution
 
 ### Windows
-1. Download the archive containing the `yandex2ytmusic.exe` file from the [latest release](../../releases).
-2. Extract the archive to a convenient directory.
-3. Run `yandex2ytmusic.exe`.
-*(Note: Windows SmartScreen might warn about an unknown publisher. To run the app, click "More info" → "Run anyway").*
+1. Download the `yandex2ytmusic.exe` file from the [latest release](../../releases).
+2. Run `yandex2ytmusic.exe`.
+*(Note: Windows SmartScreen filter may warn about an unknown publisher. Click "More info" → "Run anyway" to launch).*
 
 ### Linux (Ubuntu)
-1. Download the `yandex2ytmusic-linux` binary from the [latest release](../../releases).
-2. Extract the archive.
-3. Open a terminal in the directory with the file, grant execution permissions, and run the utility:
+1. Download the `yandex2ytmusic` binary from the [latest release](../../releases).
+2. Open a terminal in the directory with the file, grant execution permissions, and run the utility:
    ```bash
-   chmod +x yandex2ytmusic-linux
-   ./yandex2ytmusic-linux
+   chmod +x yandex2ytmusic
+   ./yandex2ytmusic
    ```
 
 ---
@@ -50,11 +48,11 @@ python3 main.py
 
 ## Usage Instructions
 
-The transfer process is divided into 4 independent stages to prevent data loss and session expiration.
+The transfer process is divided into several independent stages to prevent data loss and session expiration.
 
 ### Step 1. Obtaining Yandex Music Token
 
-To allow the program to read your "Liked Tracks" list, you need to obtain a temporary access key (token).
+To allow the program to read your "Liked tracks" list, you need to obtain a temporary access key (token).
 
 1. Follow the link: [Get Yandex Token](https://oauth.yandex.ru/authorize?response_type=token&client_id=23cabbbdc6cd418abb4b39c32c41195d).
 2. Log in to your Yandex account and confirm access.
@@ -81,14 +79,13 @@ To allow the program to read your "Liked Tracks" list, you need to obtain a temp
 To interact with your YouTube Music account, you must provide authentication data to the utility. **The manual method is the most reliable way.**
 
 1. Run the utility and select menu option `4` (Setup YouTube Music authentication), then choose option `2` (Manual).
-2. Open your browser and go to [music.youtube.com](https://music.youtube.com). Make sure you are logged into your Google account.
+2. Open the Firefox browser and go to [music.youtube.com](https://music.youtube.com). Make sure you are logged into your Google account.
 3. Open Developer Tools (**F12** or **Ctrl+Shift+I**).
 4. Go to the **Network** tab.
 5. In the filter field, type `browse`.
 6. Refresh the page or perform any action on the site (e.g., click the YouTube Music logo) to make the request appear in the list.
 7. Find a row named `browse?...` where the **Method** column says **POST**.
 8. Right-click on this request and copy the request headers:
-   - **In Google Chrome:** Copy → Copy request headers.
    - **In Firefox:** Copy Value → Copy Request Headers.
 9. Return to the terminal window with the running program.
 10. Paste the copied headers.
@@ -101,6 +98,7 @@ After these steps, the program will create a `browser.json` file, which will be 
 ### Step 4. Importing Tracks
 1. Select menu option `3` (Import to YouTube Music only) in the main menu.
 2. The utility will ask you to choose an import mode:
+   ### ATTENTION: During parallel import of more than 100 tracks, YouTube may fail to save some likes!
    * **Fast (parallel):** tracks are added using multiple threads. The order of tracks in the resulting playlist is not guaranteed.
    * **Keep order:** tracks are added sequentially. The playlist in YouTube Music will fully correspond to the order in Yandex Music.
 
@@ -109,7 +107,7 @@ After these steps, the program will create a `browser.json` file, which will be 
 ## Troubleshooting
 
 | Error / Issue | Solution |
-|---------------|----------|
+|-------------------|---------|
 | **Error 401 Unauthorized** | The YouTube session has expired. Repeat Step 3 (Authentication Setup) to update the data in `browser.json`. |
 | **Tracks not transferred** | Due to regional licensing differences or naming variations, some tracks may not be found. The list of skipped tracks is available in the `tracks.json` file (`not_found` section). |
 | **Browser launch error (Linux)** | Ensure that the system dependencies for Chromium are installed. When running from source code, execute the `playwright install-deps` command. |

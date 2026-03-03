@@ -1,5 +1,7 @@
 import os
 import json
+import time
+import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from tqdm import tqdm
@@ -109,6 +111,7 @@ class YoutubeImporter:
         search_results = {}  # idx -> (track, videoId, error)
 
         print("Поиск треков...")
+
         with tqdm(total=len(tracks), desc='Search') as pbar:
             with ThreadPoolExecutor(max_workers=max_workers) as executor:
                 futures = {executor.submit(self._search_track, track, idx): idx
@@ -146,14 +149,17 @@ class YoutubeImporter:
                     try:
                         self.ytmusic.rate_song(video_id, 'LIKE')
                         pbar.set_postfix_str(f'{track.artist} - {track.name}'[:40])
+                        time.sleep(random.uniform(1.0, 2.0))
                     except Exception as e:
                         errors.append(track)
                         pbar.write(f'Like error: {track.artist} - {track.name}: {e}')
+                        time.sleep(5) 
                     pbar.update(1)
         else:
             # Параллельное добавление (быстрее, но порядок случайный)
+            print("ВНИМАНИЕ: При параллельном импорте более 100 треков YouTube может не сохранить часть лайков!")
             with tqdm(total=len(tracks_to_like), desc='Like') as pbar:
-                with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                with ThreadPoolExecutor(max_workers=2) as executor:
                     futures = {executor.submit(self._like_track, track, video_id): track
                               for idx, track, video_id in tracks_to_like}
 
@@ -165,6 +171,7 @@ class YoutubeImporter:
                                 errors.append(track)
                                 pbar.write(f'Like error: {track.artist} - {track.name}: {error}')
                             pbar.set_postfix_str(f'{track.artist} - {track.name}'[:40])
+                            time.sleep(1.5)
                         except Exception as e:
                             errors.append(track)
                             pbar.write(f'Like error: {track.artist} - {track.name}: {e}')
